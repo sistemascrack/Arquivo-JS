@@ -46,7 +46,7 @@ async function showGroups(){
 }
 
 // pega os grupos que o usuário faz parte e os retorna como uma string separando o nome do grupo e e o id do grupo por <!!> e 
-// cada grupo por <$$>
+// cada grupo por <$$>.
 function getGroups(){
 
 	// string que armazena todos os grupos e seus ids
