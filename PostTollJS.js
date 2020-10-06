@@ -1,5 +1,3 @@
-﻿// mudança de Teste
-
 /**
  * Arquivo que contém as funções js do PostTool a serem realizadas no navegador.
  */
