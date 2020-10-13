@@ -157,15 +157,11 @@ function clickOnCommentStatusButton() {
 }
 
 /**
- * Verifica se deu o erro 429 - Too Many Requests. Com isso, a aplicação deve esperar um tempo até fazer a próxima ação.
- * Retorna true se deu o erro.
+ * Verifica se apareceu a tela de login suspeito.
  */
-function isTemporaryBlocked() {
-    try {
-        document.getElementsByClassName("error-container -cx-PRIVATE-ErrorPage__errorContainer -cx-PRIVATE-ErrorPage__errorContainer__")[0].innerText;
+function checkSuspiciousLogin() {
+    if (document.getElementById("choice_1") != null)
         return true;
-    }
-    catch {
+    else
         return false;
-    }
 }
