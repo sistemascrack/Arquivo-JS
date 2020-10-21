@@ -1,0 +1,124 @@
+function getContactNumberRSS(){
+	
+	var number = "";
+	
+	try{
+	number = document.getElementsByTagName("title")[1].textContent;
+	return number;
+	}catch(e){
+	return "";
+	}
+	
+}
+
+function getContactNameRSS(){
+	
+	var name = "";
+	
+	try{
+	name = document.getElementsByTagName("title")[0].textContent;
+	return name;
+	}catch(e){
+	return "";
+	}
+	
+	
+	
+}
+
+function getMessageRSS(){
+	
+	var message = "";
+
+	try{
+	message = document.getElementsByTagName("description")[1].textContent;
+	return message;
+	}catch(e){
+	return "";
+	}
+	
+}
+
+function getDateRSS(indContact){
+	
+	var date = "";
+	
+	try{
+		date = document.getElementsByTagName("lastBuildDate")[0].textContent.toString();
+	}catch(e){
+		return "";
+	}
+	
+	return date;
+	
+}
+
+function getNamePHP(indContact){
+
+var name = "";
+
+try{
+name = document.getElementsByClassName("contato")[indContact].children[0].textContent;
+}catch(e){
+name = "";
+}
+
+return name;
+
+}
+
+function getNumberPHP(indContact){
+
+var number = "";
+
+try{
+number = document.getElementsByClassName("contato")[indContact].children[1].textContent;
+}catch(e){
+number = "";
+}
+
+return number;
+
+}
+
+function getMessagePHP(indContact){
+
+var message = "";
+
+try{
+message = document.getElementsByClassName("contato")[indContact].children[2].textContent;
+}catch(e){
+message = "";
+}
+
+return message;
+
+}
+
+function getDatePHP(indContact){
+	
+	var date = "";
+	
+	try{
+		date = document.getElementsByClassName("contato")[indContact].childNodes[0].data.toString();
+	}catch(e){
+		return "";
+	}
+	
+	return date;
+	
+}
+
+function getTotContactsPHP(){
+	
+	var qtd = 0;
+	
+	try{
+		qtd = document.getElementsByClassName("contato").length;
+	}catch(e){
+		qtd=0;
+	}
+	
+	return qtd;
+	
+}
