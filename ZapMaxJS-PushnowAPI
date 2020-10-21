@@ -1,0 +1,209 @@
+function fillUsernameField(email){
+    try{
+        document.getElementsByClassName("form-control form-control-lg")[0].value = email;
+    }catch(e){
+
+    }
+}
+
+function fillPasswordField(pass){
+    try{
+        document.getElementsByClassName("form-control form-control-lg")[1].value = pass;
+    }catch(e){
+
+    }
+}
+
+function clickLoginButton(){
+    try{
+        document.getElementsByClassName("btn btn-primary btn-block my-1")[0].click();
+    }catch(e){
+
+    }
+}
+
+function getSituationLogin(){
+    try{
+        if(window.location.href == "https://api-zapmax.ferramentas.marketing/dashboard"){
+            return true;
+        }else{
+            return false;
+        }
+    }catch(e){
+        return false;
+    }
+}
+
+function getMessageErrorLogin(){
+    try{
+        if(document.getElementsByClassName("alert alert-danger animated fadeInDown").length>0){
+            return "errado";
+        }else{
+            return "ok";
+        }
+    }catch(e){
+        return "erro";
+    }
+}
+
+function reloadWindow(){
+    window.location.reload(true);
+}
+
+function getCurrentURL(){
+    try{
+        return window.location.href;
+    }catch(e){
+        return window.location.href;
+    }
+}
+
+function GetListCampains(){
+    
+    try{
+        var len = document.getElementsByClassName("d-flex flex-column").length;
+
+        var list ="";
+        var separator = '¢';
+        var lineSeparator = '§';
+        var name = "";
+        var origin = "";
+        var status = "";
+        var url = "";
+        if(len>=1){
+            
+            for (let index = 0; index < len; index++) {
+                name = document.getElementsByClassName("d-flex flex-column")[index].innerText.split(/(\r\n|\n|\r)/gm)[0];
+                origin = document.getElementsByClassName("d-flex flex-column")[index].innerText.split(/(\r\n|\n|\r)/gm)[2];
+                status = document.getElementsByClassName("custom-control custom-switch")[index].children[0].checked.toString();
+                url = document.getElementsByClassName("clickable d-none d-md-table-cell text-muted")[index].dataset.href;
+                list = list + name + separator + origin + separator + status + separator + url + lineSeparator;
+            }
+
+            return list;
+        }else{
+            return "nao";
+        }
+
+    }catch(e){
+            return e;
+    }
+}
+
+function findSelectCampain(ind, url){
+    try{
+        
+        document.getElementsByClassName("clickable d-none d-md-table-cell text-muted")[ind].children[0].click();
+    
+    }catch(e){
+        window.location.href = url;
+    }
+}
+
+
+
+function GetListNotifications(){
+    
+    try{
+        var len = document.getElementsByClassName("d-flex flex-column").length;
+
+        var list ="";
+        var separator = '¢';
+        var lineSeparator = '§';
+        var name = "";
+        var origin = "";
+        var status = "";
+        var url = "";
+        if(len>=3){
+            
+            for (let index = 2; index < len; index++) {
+                name = document.getElementsByClassName("d-flex flex-column")[index].innerText.split(/(\r\n|\n|\r)/gm)[0];
+                origin = document.getElementsByClassName("d-flex flex-column")[index].innerText.split(/(\r\n|\n|\r)/gm)[2];
+                status = document.getElementsByClassName("custom-control custom-switch")[index -1 ].children[0].checked.toString();
+                url = document.getElementsByClassName("dropdown")[index].children[1].children[1].href
+                
+                    list = list + name + separator + origin + separator + status + separator + url + lineSeparator;
+                   
+            }
+            return list;
+        }else{
+            return "nao";
+        }
+
+    }catch(e){
+            return e;
+    }
+}
+
+function findSelectNotification(ind){
+    try{
+        
+        document.getElementsByClassName("clickable d-none d-md-table-cell text-muted")[ind].children[0].click();
+    
+    }catch(e){
+            
+    }
+}
+
+
+function getDatesRange(){
+    
+    try{
+        return document.getElementsByName("date_range")[0].value;
+    }catch(e){
+        return "erro";
+    }
+
+}
+
+
+function getUserName(){
+    try{
+        var name = document.getElementsByClassName("nav-link dropdown-toggle")[0].innerText.trim(' ');
+        return name;
+    }catch(e){
+        return e.toString();
+    }
+}
+
+function changeStatusNotification(index,activation){
+    
+    index++;
+    status = document.getElementsByClassName("custom-control custom-switch")[index].children[0].checked;
+    
+    if(status != activation){
+        try{
+            document.getElementsByClassName("custom-control custom-switch")[index].children[1].click();
+        }catch(e){
+            document.getElementsByClassName("custom-control custom-switch")[index].children[0].click();
+        }
+    }    
+}
+
+function goToMainWindow(){
+    try{
+        window.location.href = "https://api-zapmax.ferramentas.marketing/dashboard";
+    }catch(e){
+        window.location.href = "https://api-zapmax.ferramentas.marketing/dashboard";
+    }
+}
+
+function getSessionCookie(){
+    try{
+        return document.cookie;
+    }catch(e){
+        return document.cookie;
+    }
+}
+
+function reloadSession(){
+    try {
+        document.getElementsByClassName("img-fluid navbar-logo")[0].click();
+    } catch (e) {
+        try {
+            goToMainWindow();
+        } catch (e) {
+            window.location.href = "https://api-zapmax.ferramentas.marketing/dashboard";
+        }
+    }
+}
