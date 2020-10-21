@@ -1,0 +1,947 @@
+// ============================ MyCustomScript ========================================
+
+//essa é a função que capta a mensagem que foi pegada do usuário
+function startAutoReplay() {
+	debugger
+	var myNumber = getMyNumber();
+	var itsOk = false;
+	var lastm = Store.Chat.models[Store.Chat.models.length - 1];
+	
+	Store.Chat.models.forEach(function (m) {
+
+		m.countMsgs = m.msgs.length;
+
+		if (m.id._serialized == lastm.id._serialized) {
+			itsOk = true;
+		}
+	});
+
+	setTimeout(function () {
+		setInterval(function () {
+
+			var readMSG = CefInjectedJavascript.getReadMSG();
+
+			//aqui, é lido para cada chat ativo, as mensagens carregadas do chat
+			Store.Chat.models.forEach(function (m) {
+				if (itsOk && (!m.countMsgs || m.countMsgs < m.msgs.length)) {
+					m.countMsgs = m.msgs.length;
+					
+					//o var last message recebe a última mensagem do chat
+					var lastmessage = m.msgs.models[m.msgs.length - 1];
+					if (lastmessage && !lastmessage.id.fromMe && m.id.user != myNumber && m.id.server != 'g.us') {
+						var contact = m.id.user;
+						var message = lastmessage.body;
+						var name = "";
+						console.log(lastmessage);
+
+						try {
+							name = Store.Chat.models[0].__x_contact.notifyName;
+						} catch (e) {
+
+						}
+
+						CefInjectedJavascript.jaMessage(contact, message, name);
+						// if (readMSG === true) {
+						// 	var id = contact + "@c.us";
+
+						// 	var contactIsActive = CefInjectedJavascript.leadIsActive(contact);
+
+						// 	if (contactIsActive === true) {
+						// 		window.WAPI.sendSeen(id, 0);
+						// 	}
+						// }
+					} else {
+					}
+				} else {
+				}
+			});
+
+		}, 500);
+	}, 1000);
+}
+
+function WMBSP_DeleteAllChates() {
+
+	var chat = Store.Chat.models;
+
+	for (var c = 0; c < chat.length; c++) {
+
+
+
+		if (c < chat.length) {
+
+			var id = chat[c].__x_id._serialized;
+
+			window.WAPI.deleteConversation(id);
+
+			console.log("Deleting chat: " + id);
+
+		}
+
+
+
+	}
+	return true;
+
+}
+
+function checar() {
+
+	if (Store.Conn.__x_connected === true) {
+		return 'conectado'
+	}
+	else {
+		return "carregando";
+	}
+
+}
+
+function WMBSP_GetPage(connected) {
+
+	if (connected === true) {
+
+		if (typeof Store !== 'undefined') {
+			if (typeof Store.Conn !== 'undefined') {
+				if (Store.Conn.__x_connected === true) {
+					startAutoReplay();
+					return 'dashboard'
+				}
+				else {
+					return "login";
+				}
+			}
+			else {
+				return "unknown";
+			}
+		}
+		else {
+			return "unknown";
+		}
+
+	} else {
+
+		var carregou = checkWhatsAppConnection();
+
+		if (carregou === true) {
+
+			if (typeof Store !== 'undefined') {
+				if (typeof Store.Conn !== 'undefined') {
+					if (Store.Conn.__x_connected === true) {
+						startAutoReplay();
+						console.log("Iniciou autoresponder");
+					}
+				}
+			}
+			return "dashboard";
+		} else {
+			return "login";
+		}
+
+	}
+
+
+}
+
+function checkWhatsAppConnection() {
+
+	var userIsConnected = false;
+
+	var text = "";
+
+	try {
+
+
+		if (typeof document.getElementsByClassName("J3VFH")[0] !== "undefined") {
+			if (document.getElementsByClassName("J3VFH")[0].outerText === "Search or start new chat") {
+				userIsConnected = true;
+			}
+		}
+
+		if (typeof document.getElementsByClassName("landing-landing-title VeVN5")[0] === "undefined") {
+
+			if (typeof document.getElementsByClassName("J3VFH")[0] !== "undefined" || document.getElementsByClassName("_1QMFu")[0] === null) {
+				userIsConnected = true;
+			}
+
+		} else {
+
+			if (typeof document.getElementsByClassName("landing-title VeVN5")[0] !== "undefined") {
+
+				text = document.getElementsByClassName("landing-title VeVN5")[0].outerText;
+
+				if (text == "Para usar o WhatsApp no seu computador:" || text == "To use WhatsApp on your computer:") {
+					userIsConnected = false;
+				}
+			}
+
+
+		}
+
+	} catch (e) {
+		console.log("Error e:" + e);
+		userIsConnected = false;
+	}
+
+	return userIsConnected;
+
+}
+
+function updateLeadsOptIn() {
+
+	var chat = window.Store.Chat.models;
+
+	try {
+		for (var i = 0; i < chat.length; i++) {
+
+			if (chat[i].__x_id.user !== undefined) {
+
+				if (chat[i].__x_id.user) {
+					if (chat[i].__x_contact.__x_isWAContact !== undefined) {
+						if (chat[i].__x_contact.__x_isWAContact === true) {
+
+							var contatoLimpo = chat[i].__x_id.user.split("-");
+							numero = contatoLimpo[0];
+							numero = numero;
+
+							try {
+								CefInjectedJavascript.updateOptInForLead(numero);
+							} catch (e) {
+
+							}
+
+						}
+					}
+				}
+
+			}
+
+		}
+
+	} catch (e) {
+
+	}
+
+
+	return checked;
+
+}
+
+function checkLeadName(numberLead) {
+
+	var contact = window.Store.Contact.models;
+	var leadName = "";
+
+	try {
+		for (var i = 0; i < contact.length; i++) {
+
+			if (contact[i].__x_id.user !== undefined) {
+				if (contact[i].__x_id.user === numberLead && contact[i].__x_isMyContact !== undefined) {
+					if (contact[i].__x_isWAContact !== undefined) {
+						if (contact[i].__x_isWAContact === true) {
+							if (contact[i].__x_isMyContact === true) {
+								if (contact[i].__x_formattedName !== undefined && contact[i].__x_formattedName !== null && contact[i].__x_formattedName !== "") {
+									leadName = contact[i].__x_formattedName;
+									break;
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+		}
+	} catch (e) {
+
+	}
+
+	return leadName;
+
+}
+
+function WMBSP_CheckWhatsappAccount(id) {
+
+	Store.WapQuery.queryExist(id).then(function (e) {
+		if (e.status === 200) {
+			CefInjectedJavascript.resultado(true);
+			return true;
+		} else {
+			CefInjectedJavascript.resultado(false);
+			return false;
+		}
+	});
+}
+
+function getMyNumber() {
+
+	try {
+		return Store.Conn.__x_me.user;
+	} catch (e) {
+		return "Número";
+	}
+
+}
+
+function getMyName() {
+
+	try {
+		if (Store.Conn !== null) {
+			return Store.Conn.__x_pushname;
+		}
+	} catch (e) {
+		return "";
+	}
+
+}
+
+function getMyLastMessageFromChatByID(number) {
+
+	var chat = getChatModelByNumber(number);
+	var wellcomeMessage = CefInjectedJavascript.getWellcomMessage();
+	var messages = chat.msgs._models;
+	var myLastMessage = getMyLastMessage(number);
+	var validateSaveName = false;
+
+	try {
+
+		for (var m = 0; m < messages.length; m++) {
+
+			if (messages.length > 1 && m > 0) {
+				if (messages[m - 1].__x_isSentByMe === true && messages[m - 1].__x_text === myLastMessage && myLastMessage !== "NotFound") {
+					if (myLastMessage === wellcomeMessage) {
+						validateSaveName = true;
+					}
+				}
+			}
+
+		}
+
+	} catch (e) {
+
+	}
+
+	return validateSaveName;
+
+}
+
+function getChatModelByNumber(number) {
+
+	var chats = window.Store.Chat._models;
+	var chatID;
+
+	for (var c = 0; c < chats.length; c++) {
+
+		if (chats[c].__x_id !== null) {
+			if (chats[c].__x_id.user === number) {
+				chatID = chats[c];
+			}
+		}
+
+	}
+
+	return chatID;
+
+}
+
+function getMyLastMessage(number) {
+
+	var myMessage = "NotFound";
+	var chat = getChatModelByNumber(number);
+	var msgs = chat.msgs._models;
+
+	try {
+		for (var i = 0; i < msgs.length; i++) {
+
+			if (msgs[i].__x_isSentByMe !== null && msgs[i].__x_isSentByMe !== undefined) {
+				if (msgs[i].__x_isSentByMe === true) {
+					myMessage = msgs[i].__x_text;
+				}
+			}
+
+		}
+	} catch (e) {
+
+	}
+
+	return myMessage;
+
+}
+
+function markAllAsRead() {
+
+	var chats = Store.Chat._models;
+
+	var qtd = getCountOfChats();
+
+	for (var i = 0; i < qtd; i++) {
+
+		var numero = "";
+
+		if (chats[i].__x_contact.__x_isUser !== null && chats[i].__x_contact.__x_isUser === true && chats[i].__x_contact.__x_isMe === false) {
+			if (chats[i].__x_id.user !== "") {
+				numero = chats[i].__x_id.user;
+			}
+
+			if (chats[i].__x_id.user.includes("-")) {
+				var contatoLimpo = chats[i].__x_id.user.split("-");
+				numero = contatoLimpo[0];
+			}
+
+		}
+
+		numero = numero + "@c.us";
+
+		window.WAPI.sendSeen(numero, i);
+
+	}
+
+}
+
+function markOnlyActivesAsRead(numeroLead) {
+
+	var chats = Store.Chat._models;
+
+	var qtd = getCountOfChats();
+
+	for (var i = 0; i < qtd; i++) {
+
+		var numero = "";
+
+		if (chats[i].__x_contact.__x_isUser !== null && chats[i].__x_contact.__x_isUser === true && chats[i].__x_contact.__x_isMe === false) {
+			if (chats[i].__x_id.user !== "") {
+				numero = chats[i].__x_id.user;
+			}
+
+			if (chats[i].__x_id.user.includes("-")) {
+				var contatoLimpo = chats[i].__x_id.user.split("-");
+				numero = contatoLimpo[0];
+			}
+
+		}
+
+		if (numero === numeroLead) {
+			numero = numero + "@c.us";
+			window.WAPI.sendSeen(numero, i);
+		}
+
+	}
+
+}
+
+function getAllContacts(unknownNotAllowed) {
+
+	var contatos = Store.Contact._models;
+
+	var qtd = getCountOfContacts();
+
+	for (var i = 0; i < qtd; i++) {
+
+		var numero = "";
+		var nome = "";
+		var isMyContact = true;
+
+
+		if (contatos[i].__x_isUser !== null && contatos[i].__x_isUser === true && contatos[i].__x_isMe === false) {
+			if (contatos[i].__x_id.user !== "") {
+				numero = contatos[i].__x_id.user;
+				nome = contatos[i].__x_formattedName;
+			}
+
+			if (contatos[i].__x_id.user.includes("-")) {
+				var contatoLimpo = contatos[i].__x_id.user.split("-");
+				numero = contatoLimpo[0];
+				nome = contatos[i].__x_formattedName;
+			}
+
+			if (contatos[i].__x_isMyContact !== null) {
+
+				if (contatos[i].__x_isMyContact === true) {
+					isMyContact = true;
+				} else {
+					isMyContact = false;
+				}
+
+			}
+		}
+
+
+		if (unknownNotAllowed === false) {
+			CefInjectedJavascript.synchronizeContact(numero, nome);
+		} else if (unknownNotAllowed === true && isMyContact === true) {
+			CefInjectedJavascript.synchronizeContact(numero, nome);
+		}
+
+
+	}
+}
+
+function getCountOfContacts() {
+
+	return Store.Contact._models.length;
+
+}
+
+function getAllContactsFromChats(unknownNotAllowed) {
+
+	var chats = Store.Chat._models;
+
+	var qtd = getCountOfChats();
+
+	for (var i = 0; i < qtd; i++) {
+
+		var numero = "";
+		var nome = "";
+		var isMyContact = true;
+
+		if (chats[i].__x_contact.__x_isUser !== null && chats[i].__x_contact.__x_isUser === true && chats[i].__x_contact.__x_isMe === false) {
+			if (chats[i].__x_id.user !== "") {
+				numero = chats[i].__x_id.user;
+				nome = chats[i].__x_contact.__x_formattedName;
+			}
+
+			if (chats[i].__x_id.user.includes("-")) {
+				var contatoLimpo = chats[i].__x_id.user.split("-");
+				numero = contatoLimpo[0];
+				nome = chats[i].__x_contact.__x_formattedName;
+			}
+
+			if (chats[i].__x_contact.__x_isMyContact !== null) {
+
+				if (chats[i].__x_contact.__x_isMyContact === true) {
+					isMyContact = true;
+				} else if (chats[i].__x_contact.__x_isMyContact === false) {
+					isMyContact = false;
+				}
+
+			}
+		}
+
+		if (unknownNotAllowed === false) {
+			CefInjectedJavascript.synchronizeContact(numero, nome);
+		} else if (unknownNotAllowed === true && isMyContact === true) {
+			CefInjectedJavascript.synchronizeContact(numero, nome);
+		}
+
+	}
+
+}
+
+function getCountOfChats() {
+
+	return Store.Chat._models.length;
+
+
+}
+
+function getAllContactsFromGroup(groupName, unknownNotAllowed) {
+
+	var numero = "";
+	var nome = "";
+	var isMyContact = true;
+
+	var grp = window.WAPI.getAllGroups();
+
+	for (var gp = 0; gp < grp.length; gp++) {
+
+		if (grp[gp].__x_formattedTitle !== null) {
+
+			if (grp[gp].__x_formattedTitle === groupName) {
+
+				for (var contact = 0; contact < grp[gp].__x_groupMetadata.participants._models.length; contact++) {
+
+					if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isUser !== null && grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isUser === true && grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMe === false) {
+						numero = grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_id.user;
+						nome = grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_formattedName;
+
+						if (numero.includes("-")) {
+							var contatoLimpo = numero.split("-");
+							numero = contatoLimpo[0];
+						}
+
+
+						if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMyContact !== null) {
+
+							if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMyContact === true) {
+								isMyContact = true;
+							} else {
+								isMyContact = false;
+							}
+
+						}
+					}
+
+					if (unknownNotAllowed === false) {
+						CefInjectedJavascript.addContactFromGroup(numero, nome);
+					} else if (unknownNotAllowed === true && isMyContact === true) {
+						CefInjectedJavascript.addContactFromGroup(numero, nome);
+					}
+
+
+
+				}
+
+			}
+		}
+
+	}
+
+}
+
+function getAllNamesGroup() {
+
+	const groups = window.WAPI.getAllGroups();
+
+	for (var gp = 0; gp < groups.length; gp++) {
+
+		if (groups[gp] !== null) {
+
+			if (groups[gp].__x_formattedTitle !== "") {
+				CefInjectedJavascript.addGroup(groups[gp].__x_formattedTitle);
+			}
+
+		}
+
+	}
+
+}
+
+function getCountOfGroups() {
+
+	const groups = window.WAPI.getAllGroups();
+
+	return groups.length;
+
+}
+
+function getCountContactsOfGroups(groupName) {
+
+	const groups = window.WAPI.getAllGroups();
+
+	var qtdContactsGP = 0;
+
+	for (var gp = 0; gp < groups.length; gp++) {
+
+		if (groups[gp].__x_formattedTitle !== null) {
+
+			if (groups[gp].__x_formattedTitle === groupName) {
+
+				for (var contact = 0; contact < groups[gp].__x_groupMetadata.participants._models.length; contact++) {
+
+					qtdContactsGP++;
+
+				}
+			}
+		}
+
+	}
+
+	return qtdContactsGP;
+
+}
+function sendMessageToContact(id, msgText, isReturn) {
+	try {
+		
+		console.log("mensagem: "+msgText);
+		
+		window.getContact = (id) => {
+			return Store.WapQuery.queryExist(id);
+		}
+
+		window.getContact(id).then(contact => {
+			if (contact.status === 404) {
+				if (isReturn === true) {
+					// CefInjectedJavascript.resultado(false);
+				}
+			} else {
+				Store.Chat.find(contact.jid).then(chat => {
+					chat.sendMessage(msgText);
+					if (isReturn === true) {
+
+					}
+					// CefInjectedJavascript.resultado(true);
+					return true;
+				}).catch(reject => {
+					if (WAPI.sendMessage(id, msgText)) {
+						if (isReturn === true) {
+
+						}
+						// CefInjectedJavascript.resultado(true);
+						return true;
+					} else {
+						if (isReturn === true) {
+
+						}
+						// CefInjectedJavascript.resultado(false);
+						return false;
+					}
+				});
+			}
+		});
+	} catch (e) {
+		if (isReturn === true) {
+			CefInjectedJavascript.resultado(false);
+		}
+	}
+
+	return false;
+
+}
+
+function getAllGroupsContacts(unknownNotAllowed) {
+
+	var numero = "";
+	var nome = "";
+	var isMyContact = true;
+
+	var grp = window.WAPI.getAllGroups();
+
+	for (var gp = 0; gp < grp.length; gp++) {
+
+		if (grp[gp].__x_formattedTitle !== null) {
+
+			for (var contact = 0; contact < grp[gp].__x_groupMetadata.participants._models.length; contact++) {
+
+				if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isUser !== null && grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isUser === true && grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMe === false) {
+
+					numero = grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_id.user;
+					nome = grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_formattedName;
+
+					if (numero.includes("-")) {
+						var contatoLimpo = numero.split("-");
+						numero = contatoLimpo[0];
+					}
+
+
+					if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMyContact !== null) {
+
+						if (grp[gp].__x_groupMetadata.participants._models[contact].__x_contact.__x_isMyContact === true) {
+							isMyContact = true;
+						} else {
+							isMyContact = false;
+						}
+
+					}
+				}
+
+				if (unknownNotAllowed === false) {
+					CefInjectedJavascript.addContactFromGroup(numero, nome);
+				} else if (unknownNotAllowed === true && isMyContact === true) {
+					CefInjectedJavascript.addContactFromGroup(numero, nome);
+				}
+
+			}
+
+
+		}
+
+	}
+
+}
+
+function getCountContactsAllGroups() {
+
+	var grp = window.WAPI.getAllGroups();
+
+	var qtdContactsGroups = 0;
+
+	for (var gp = 0; gp < grp.length; gp++) {
+
+		if (grp[gp].__x_formattedTitle !== null) {
+
+			qtdContactsGroups = qtdContactsGroups + grp[gp].__x_groupMetadata.participants._models.length;
+
+
+		}
+
+	}
+
+	return qtdContactsGroups;
+
+}
+
+function WMBSP_GETPROFILEPICTUREFROMID(id) {
+
+	try {
+		var urlImage = "";
+
+		urlImage = Store.ProfilePicThumb._index[id].__x_eurl;
+
+		return urlImage;
+	} catch (e) {
+		return "";
+	}
+
+}
+
+function WMBSP_GETPROFILEPICTUREFROMCONTACT(id) {
+
+	try {
+		var urlImage = "";
+
+		urlImage = Store.Contact._index[id].__x_profilePicThumb.__x_eurl;
+
+		return urlImage;
+	} catch (e) {
+		return "";
+	}
+
+}
+
+function _requireById(id) {
+	try {
+		if (typeof webpackJsonp === 'function') {
+			return webpackJsonp([], null, [id]);
+		} else {
+			return webpackJsonp.push([], null, [id]);
+		}
+	} catch (e) {
+		console.log("Erro " + e);
+		return false;
+	}
+}
+
+var createFromData_id = "beeieigghj";
+var prepareRawMedia_id = "ddgbhifaji";
+var chat_id = "dbbhhgjjbg";
+
+function SendMediaFileChatBot(id, isReturn = true) {
+
+	debugger;
+
+	var caption = CefInjectedJavascript.getChatBotMessage();
+	var typefile = CefInjectedJavascript.getTypeFile();
+	var filename = CefInjectedJavascript.getFileName();
+	var idUser = id;
+	var imgBase64 = CefInjectedJavascript.getBase64();
+	//var caption = CefInjectedJavascript.getMessage();
+
+	try {
+
+		return Store.Chat.find(idUser).then((chat) => {
+
+			var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
+			var mc = new Store.MediaCollection(chat);
+			mc.processAttachments([{ file: mediaBlob }, 1], chat, 1).then(() => {
+				let media = mc.models[0];
+				media.sendToChat(chat, { caption: caption });
+				if (done !== undefined) done(true);
+
+			});
+
+
+			//window.WAPI.procFiles(chat,mediaBlob).then(mc => {
+			//    var media = mc.models[0];
+			//    media.sendToChat(chat, { caption: caption });
+			//});
+
+		});
+
+	} catch (e) {
+		if (isReturn) {
+			CefInjectedJavascript.resultSend(id, false);
+		}
+	}
+
+}
+
+function WMBSP_SendMediaFile2(id, isReturn = true) {
+
+	debugger;
+	var createFromDataClass = _requireById(createFromData_id)["default"];
+	var prepareRawMediaClass = _requireById(prepareRawMedia_id).prepRawMedia;
+	var msgText = CefInjectedJavascript.getMessage();
+	var base64 = CefInjectedJavascript.getBase64();
+	var typefile = CefInjectedJavascript.getTypeFile();
+	var filename = CefInjectedJavascript.getFileName();
+
+	Store.WapQuery.queryExist(id).then(function (e) {
+		if (e.status === 200) {
+			Store.Chat.find(e.jid).then((chat) => {
+				try {
+
+
+
+					var byteCharacters = atob(base64);
+					var byteNumbers = new Array(byteCharacters.length);
+					for (var i = 0; i < byteCharacters.length; i++) {
+						byteNumbers[i] = byteCharacters.charCodeAt(i);
+					}
+					var byteArray = new Uint8Array(byteNumbers);
+
+
+					var file = new File([byteArray], filename, {
+						type: typefile,
+					});
+					// myBlob is now the blob that the object URL pointed to.
+					var temp = createFromDataClass.createFromData(file, file.type);
+					var rawMedia = prepareRawMediaClass(temp, {});
+					var target = null;
+
+					var textPortion = {
+						caption: msgText,
+						mentionedJidList: [],
+						quotedMsg: target
+					};
+
+					rawMedia.sendToChat(chat, textPortion);
+					if (isReturn)
+						CefInjectedJavascript.resultSend(id, true);
+				} catch (e) {
+
+
+					console.log(e);
+					if (isReturn)
+						CefInjectedJavascript.resultSend(id, false);
+				}
+
+			});
+		}
+		else {
+			if (isReturn)
+				CefInjectedJavascript.resultSend(id, false);
+		}
+	});
+
+	return true;
+}
+
+function WMBSP_SendMediaFile(id, isReturn = true) {
+
+	var idUser = id;
+	var imgBase64 = CefInjectedJavascript.getBase64();
+	var filename = CefInjectedJavascript.getFileName();
+	var caption = CefInjectedJavascript.getMessage();
+
+	try {
+
+		return Store.Chat.find(idUser).then((chat) => {
+
+			var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
+			var mc = new Store.MediaCollection(chat);
+			mc.processAttachments([{ file: mediaBlob }, 1], chat, 1).then(() => {
+				let media = mc.models[0];
+				media.sendToChat(chat, { caption: caption });
+				if (done !== undefined) done(true);
+
+			});
+			//window.WAPI.procFiles(chat,mediaBlob).then(mc => {
+			//    var media = mc.models[0];
+			//    media.sendToChat(chat, { caption: caption });
+			//});
+
+		});
+
+		if (isReturn)
+			CefInjectedJavascript.resultSend(id, true);
+
+	} catch (e) {
+		if (isReturn) {
+			CefInjectedJavascript.resultSend(id, false);
+		}
+	}
+
+}
+
+function reloadDocument() {
+	document.location.reload();
+}
