@@ -277,7 +277,7 @@ function getMyNumber() {
 	try {
 		return Store.Conn.__x_me.user;
 	} catch (e) {
-		return "Numero";
+		return "Carregando";
 	}
 
 }
