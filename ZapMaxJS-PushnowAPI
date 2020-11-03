@@ -24,7 +24,7 @@ function clickLoginButton(){
 
 function getSituationLogin(){
     try{
-        if(window.location.href == "https://api-zapmax.ferramentas.marketing/dashboard"){
+        if(window.location.href != "https://api-zapmax.ferramentas.marketing/login"){
             return true;
         }else{
             return false;
