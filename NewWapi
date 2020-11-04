@@ -1321,7 +1321,7 @@ window.WAPI.getNewMessageIdVCard = function (chatId) {
 *contactNumber = "5519992605703" //e o numero do contato
 */
 window.WAPI.sendVCard = async function (chatId, vcard, contactName, contactNumber) {
-    vcard = vcard.replaceAll('$','\n');
+    vcard = vcard.replace(/<>/g,'\n');
     var chat    = Store.Chat.get(chatId);
     var tempMsg = Object.create(Store.Msg.models.filter(msg => msg.__x_isSentByMe && !msg.quotedMsg)[0]);
     var newId   = window.WAPI.getNewMessageIdVCard(chatId);
