@@ -160,7 +160,7 @@ function clickOnCommentStatusButton() {
  * Verifica se apareceu a tela de login suspeito.
  */
 function checkSuspiciousLogin() {
-    if (document.getElementById("choice_1") != null)
+    if (document.getElementById("choice_1") != null || document.getElementsByClassName("NXVPg Szr5J coreSpriteLock")[0] != "undefined")
         return true;
     else
         return false;
