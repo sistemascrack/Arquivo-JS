@@ -25,7 +25,10 @@ if (!window.Store) {
                 { id: "UserConstructor", conditions: (module) => (module.default && module.default.prototype && module.default.prototype.isServer && module.default.prototype.isUser) ? module.default : null },
                 { id: "SendTextMsgToChat", conditions: (module) => (module.sendTextMsgToChat) ? module.sendTextMsgToChat : null },
                 { id: "SendSeen", conditions: (module) => (module.sendSeen) ? module.sendSeen : null },
-                { id: "sendDelete", conditions: (module) => (module.sendDelete) ? module.sendDelete : null }
+                { id: "sendDelete", conditions: (module) => (module.sendDelete) ? module.sendDelete : null },
+                { id: "addAndSendMsgToChat", conditions: (module) => (module.addAndSendMsgToChat) ? module.addAndSendMsgToChat : null },
+                { id: "MsgKey", conditions: (module) => (module.default&&module.default.toString().includes('MsgKey error: obj is null/undefined')) ? module.default : null },
+                { id: "WidFactory", conditions: (module) => (module.isWidlike && module.createWid && module.createWidFromWidLike) ? module : null }
             ];
             for (let idx in modules) {
                 if ((typeof modules[idx] === "object") && (modules[idx] !== null)) {
@@ -1294,46 +1297,48 @@ window.WAPI.getNewMessageId = function (chatId) {
 };
 
 /**
- * Send Customized VCard without the necessity of contact be a Whatsapp Contact
+ * Create an chat ID based in a cloned one for vCard
  *
  * @param {string} chatId '000000000000@c.us'
- * @param {object|array} vcard { displayName: 'Contact Name', vcard: 'BEGIN:VCARD\nVERSION:3.0\nN:;Contact Name;;;\nEND:VCARD' } | [{ displayName: 'Contact Name 1', vcard: 'BEGIN:VCARD\nVERSION:3.0\nN:;Contact Name 1;;;\nEND:VCARD' }, { displayName: 'Contact Name 2', vcard: 'BEGIN:VCARD\nVERSION:3.0\nN:;Contact Name 2;;;\nEND:VCARD' }]
  */
-window.WAPI.sendVCard = function (chatId, vcard) {
+window.WAPI.getNewMessageIdVCard = function (chatId) {
+    var newMsgId = new Store.MsgKey(Object.assign({}, Store.Msg.models[0].__x_id))
+
+    newMsgId.fromMe = true;
+    newMsgId.id = WAPI.getNewId().toUpperCase();
+    newMsgId.remote = new Store.WidFactory.createWid(chatId);
+    newMsgId._serialized = `${newMsgId.fromMe}_${newMsgId.remote}_${newMsgId.id}`
+
+    return newMsgId;
+};
+
+/**
+ * Send Customized VCard without the necessity of contact be a Whatsapp Contact
+*
+*chatId = "5519992605703@c.us" //para quem quero enviar 
+*vcard = "BEGIN:VCARD\nVERSION:3.0\nN:;0;;;\nFN:Carlos\nTEL;type=CELL;waid=550000000000:+00 00 0000-0000\nEND:VCARD" //propriedade do Vcard
+*contactName = "5519992605703" //nome do contato que será enviado
+*contactNumber = "5519992605703" //e o numero do contato
+*/
+window.WAPI.sendVCard = async function (chatId, vcard, contactName, contactNumber) {
     var chat    = Store.Chat.get(chatId);
-    var tempMsg = Object.create(Store.Msg.models.filter(msg => msg.__x_isSentByMe)[0]);
-    var newId   = window.WAPI.getNewMessageId(chatId);
+    var tempMsg = Object.create(Store.Msg.models.filter(msg => msg.__x_isSentByMe && !msg.quotedMsg)[0]);
+    var newId   = window.WAPI.getNewMessageIdVCard(chatId);
 
     var extend = {
-        ack     : 0,
-        id      : newId,
-        local   : !0,
-        self    : "out",
-        t       : parseInt(new Date().getTime() / 1000),
-        to      : chatId,
+        ack: 0,
+        id: newId,
+        local: !0,
+        self: "out",
+        t: parseInt(new Date().getTime() / 1000),
+        to: chatId,
         isNewMsg: !0,
+        type: "vcard",
+        body:contactNumber?vcard.replace('TEL;TYPE=WORK,VOICE:',`TEL;TYPE=WORK,VOICE;waid=${contactNumber}:`):vcard,
     };
 
-    if (Array.isArray(vcard)) {
-        Object.assign(extend, {
-            type     : "multi_vcard",
-            vcardList: vcard
-        });
-
-        delete extend.body;
-    } else {
-        Object.assign(extend, {
-            type   : "vcard",
-            subtype: vcard.displayName,
-            body   : vcard.vcard
-        });
-
-        delete extend.vcardList;
-    }
-
     Object.assign(tempMsg, extend);
-
-    chat.addAndSendMsg(tempMsg);
+    return (await Promise.all(Store.addAndSendMsgToChat(chat, tempMsg)))[1]=="success"
 };
 /**
  * Block contact
