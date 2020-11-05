@@ -26,7 +26,7 @@ if (!window.Store) {
                 { id: "SendTextMsgToChat", conditions: (module) => (module.sendTextMsgToChat) ? module.sendTextMsgToChat : null },
                 { id: "SendSeen", conditions: (module) => (module.sendSeen) ? module.sendSeen : null },
                 { id: "sendDelete", conditions: (module) => (module.sendDelete) ? module.sendDelete : null },
-                { id: "addAndSendMsgToChat", conditions: (module) => (module.addAndSendMsgToChat) ? module.addAndSendMsgToChat : null },
+		{ id: "addAndSendMsgToChat", conditions: (module) => (module.addAndSendMsgToChat) ? module.addAndSendMsgToChat : null },
                 { id: "MsgKey", conditions: (module) => (module.default&&module.default.toString().includes('MsgKey error: obj is null/undefined')) ? module.default : null },
                 { id: "WidFactory", conditions: (module) => (module.isWidlike && module.createWid && module.createWidFromWidLike) ? module : null }
             ];
@@ -64,6 +64,7 @@ if (!window.Store) {
                         window.Store.sendMessage = function (e) {
                             return window.Store.SendTextMsgToChat(this, ...arguments);
                         };
+
                         return window.Store;
                     }
                 }
@@ -300,8 +301,12 @@ window.WAPI.getAllGroups = function (done) {
 window.WAPI.getChat = function (id, done) {
     id = typeof id == "string" ? id : id._serialized;
     const found = window.Store.Chat.get(id);
+    // console.log("id: " + id);
+    // console.log("chat antes de pegar: "+found);
+    // console.log("TENTATIVA RAW: " + window.Store.Chat.get(id));
     found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
     if (done !== undefined) done(found);
+    // console.log("chat depois de definir: " + found);
     return found;
 }
 
@@ -544,7 +549,7 @@ window.WAPI.getGroupMetadata = async function (id, done) {
 
     if (output !== undefined) {
         if (output.stale) {
-            await window.Store.GroupMetadata.update(id);
+            await output.update();
         }
     }
 
@@ -733,93 +738,192 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
     }
 };
 
-window.WAPI.sendMessageToID = function (id, message, done) {
-    try {
-        window.getContact = (id) => {
-            return Store.WapQuery.queryExist(id);
-        }
-        window.getContact(id).then(contact => {
-            if (contact.status === 404) {
-                done(true);
-            } else {
-                Store.Chat.find(contact.jid).then(chat => {
-                    chat.sendMessage(message);
-                    return true;
-                }).catch(reject => {
-                    if (WAPI.sendMessage(id, message)) {
-                        done(true);
-                        return true;
-                    }else{
-                        done(false);
-                        return false;
-                    }
-                });
-            }
-        });
+// window.WAPI.sendMessageToID = function (id, message, done) {
+//     try {
+//         window.getContact = (id) => {
+//             return Store.WapQuery.queryExist(id);
+//         }
+//         window.getContact(id).then(contact => {
+//             if (contact.status === 404) {
+//                 done(true);
+//             } else {
+//                 Store.Chat.find(contact.jid).then(chat => {
+//                     chat.sendMessage(message);
+//                     return true;
+//                 }).catch(reject => {
+//                     if (WAPI.sendMessage(id, message)) {
+//                         done(true);
+//                         return true;
+//                     }else{
+//                         done(false);
+//                         return false;
+//                     }
+//                 });
+//             }
+//         });
+//     } catch (e) {
+//         if (window.Store.Chat.length === 0)
+//             return false;
+
+//         firstChat = Store.Chat.models[0];
+//         var originalID = firstChat.id;
+//         firstChat.id = typeof originalID === "string" ? id : new window.Store.UserConstructor(id, { intentionallyUsePrivateConstructor: true });
+//         if (done !== undefined) {
+//             firstChat.sendMessage(message).then(function () {
+//                 firstChat.id = originalID;
+//                 done(true);
+//             });
+//             return true;
+//         } else {
+//             firstChat.sendMessage(message);
+//             firstChat.id = originalID;
+//             return true;
+//         }
+//     }
+//     if (done !== undefined) done(false);
+//     return false;
+// }
+
+
+window.WAPI.sendMessageToID = function (id, isReturn) {
+	
+	debugger;
+  
+  message = CefInjectedJavascript.getMessage();
+  
+  console.log("MESSAGE: " + message);
+  
+  if(message===""){
+  message=CefInjectedJavascript.getDefaultMessage();
+  }
+	
+	try {
+            sendMessageToContact(id,message,isReturn);   
+			console.log("Executou função de envio");
     } catch (e) {
-        if (window.Store.Chat.length === 0)
-            return false;
-
-        firstChat = Store.Chat.models[0];
-        var originalID = firstChat.id;
-        firstChat.id = typeof originalID === "string" ? id : new window.Store.UserConstructor(id, { intentionallyUsePrivateConstructor: true });
-        if (done !== undefined) {
-            firstChat.sendMessage(message).then(function () {
-                firstChat.id = originalID;
-                done(true);
-            });
-            return true;
-        } else {
-            firstChat.sendMessage(message);
-            firstChat.id = originalID;
-            return true;
-        }
-    }
-    if (done !== undefined) done(false);
-    return false;
-}
-
-window.WAPI.sendMessage = function (id, message, done) {
-    var chat = WAPI.getChat(id);
-    if (chat !== undefined) {
-        if (done !== undefined) {
-            chat.sendMessage(message).then(function () {
-                function sleep(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-
-                var trials = 0;
-
-                function check() {
-                    for (let i = chat.msgs.models.length - 1; i >= 0; i--) {
-                        let msg = chat.msgs.models[i];
-
-                        if (!msg.senderObj.isMe || msg.body != message) {
-                            continue;
-                        }
-                        done(WAPI._serializeMessageObj(msg));
-                        return True;
-                    }
-                    trials += 1;
-                    console.log(trials);
-                    if (trials > 30) {
-                        done(true);
-                        return;
-                    }
-                    sleep(500).then(check);
-                }
-                check();
-            });
-            return true;
-        } else {
-            chat.sendMessage(message);
-            return true;
-        }
-    } else {
-        if (done !== undefined) done(false);
+			console.log("Não executou função de envio");
         return false;
     }
-};
+    
+}
+
+window.WAPI.sendChatBotMsgToID = function (id, isReturn) {
+
+    debugger;
+    
+    message = CefInjectedJavascript.getChatBotMessage();
+    
+    console.log("MESSAGE: " + message);
+    
+    if(message===""){
+    message=CefInjectedJavascript.getDefaultMessage();
+    }
+      
+      try {
+              sendMessageToContact(id,message,isReturn);   
+              console.log("Executou função de envio");
+      } catch (e) {
+              console.log("Não executou função de envio");
+          return false;
+      }
+      
+  }
+  
+  window.WAPI.sendRSSMsgToID = function (id, message, isReturn) {
+      
+    try{
+
+    debugger;
+    
+    console.log("MESSAGE: " + message);
+    
+    if(message===""){
+    message=CefInjectedJavascript.getDefaultMessage();
+    }
+      
+      try {
+              sendMessageToContact(id,message,isReturn);   
+              console.log("Executou função de envio");
+              return true;
+      } catch (e) {
+              console.log("Não executou função de envio");
+          return false;
+      }
+    }catch(e){
+        console.log("erro na msg rss " + e);
+    }
+  }
+
+  window.WAPI.sendMessage = async function (id, message) {
+    try{
+        console.log("message no sendMessage-> " + message);
+        if(id==='status@broadcast') return false;
+        let chat = WAPI.getChat(id);
+        if(!chat && !id.includes('g')) {
+            var contact = WAPI.getContact(id)
+            if(!contact) return false;
+            await Store.Chat.find(contact.id)
+            chat = WAPI.getChat(id);
+        }
+        if (chat !== undefined) {
+                // return WAPI.sendMessageReturnId(chat,message).then(id=>{return id})
+                // console.log("o chat não é undefined");
+                await chat.sendMessage(message).then(_=>chat.lastReceivedKey._serialized);
+                CefInjectedJavascript.resultado(true);
+        }else{
+            // console.log("o chat é undefined");
+            CefInjectedJavascript.resultado(false);
+        } 
+        
+        
+    }catch(e){
+        CefInjectedJavascript.resultado(false);
+        console.log("erro sendMessage-> " + e);
+    }
+    return false;
+    };
+
+ window.WAPI.sendMessage = function (id, message, done) {
+     var chat = WAPI.getChat(id);
+     if (chat !== undefined) {
+         if (done !== undefined) {
+             chat.sendMessage(message).then(function () {
+                 function sleep(ms) {
+                     return new Promise(resolve => setTimeout(resolve, ms));
+                 }
+
+                 var trials = 0;
+
+                 function check() {
+                     for (let i = chat.msgs.models.length - 1; i >= 0; i--) {
+                         let msg = chat.msgs.models[i];
+
+                         if (!msg.senderObj.isMe || msg.body != message) {
+                             continue;
+                         }
+                         done(WAPI._serializeMessageObj(msg));
+                         return True;
+                     }
+                     trials += 1;
+                     console.log(trials);
+                     if (trials > 30) {
+                         done(true);
+                         return;
+                     }
+                     sleep(500).then(check);
+                 }
+                 check();
+             });
+             return true;
+         } else {
+             chat.sendMessage(message);
+             return true;
+         }
+     } else {
+         if (done !== undefined) done(false);
+         return false;
+     }
+ };
 
 window.WAPI.sendMessage2 = function (id, message, done) {
     var chat = WAPI.getChat(id);
@@ -1118,23 +1222,54 @@ window.WAPI.deleteMessage = function (chatId, messageArray, revoke=false, done) 
     return true;
 };
 
-window.WAPI.checkNumberStatus = function (id, done) {
-    window.Store.WapQuery.queryExist(id).then((result) => {
-        if( done !== undefined) {
-            if (result.jid === undefined) throw 404;
+
+window.WAPI.checkNumberStatus = async function (id, done) {
+    try {
+        const result = await window.Store.WapQuery.queryExist(id);
+        if (result.jid === undefined){
+            CefInjectedJavascript.resultNumberExists(false, id);
+            throw 404;
+        } 
+        const data = window.WAPI._serializeNumberStatusObj(result);
+        if (data.status == 200){
+            data.numberExists = true
+            CefInjectedJavascript.resultNumberExists(true, data.id._serialized);
+        } 
+        if (done !== undefined) {
             done(window.WAPI._serializeNumberStatusObj(result));
+            done(data);
         }
-    }).catch((e) => {
+        return data;
+    } catch (e) {
         if (done !== undefined) {
             done(window.WAPI._serializeNumberStatusObj({
                 status: e,
-                jid   : id
+                jid: id
             }));
         }
-    });
-
-    return true;
+        CefInjectedJavascript.resultNumberExists(false, id);
+        return e;
+    }
 };
+
+
+// window.WAPI.checkNumberStatus = function (id, done) {
+//     window.Store.WapQuery.queryExist(id).then((result) => {
+//         if( done !== undefined) {
+//             if (result.jid === undefined) throw 404;
+//             done(window.WAPI._serializeNumberStatusObj(result));
+//         }
+//     }).catch((e) => {
+//         if (done !== undefined) {
+//             done(window.WAPI._serializeNumberStatusObj({
+//                 status: e,
+//                 jid   : id
+//             }));
+//         }
+//     });
+
+//     return true;
+// };
 
 /**
  * New messages observable functions.
@@ -1246,18 +1381,33 @@ return Store.Chat.find(idUser).then((chat) => {
 }
 
 window.WAPI.base64ImageToFile = function (b64Data, filename) {
-    var arr   = b64Data.split(',');
-    var mime  = arr[0].match(/:(.*?);/)[1];
-    var bstr  = atob(arr[1]);
-    var n     = bstr.length;
+    var arr = b64Data.split(',');
+    //var mime = arr[0].match(/:(.*?);/)[1];
+    var mime = CefInjectedJavascript.getTypeFile();
+    var bstr = atob(arr[0]);
+    var n = bstr.length;
     var u8arr = new Uint8Array(n);
 
     while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
     }
 
-    return new File([u8arr], filename, {type: mime});
+    return new File([u8arr], filename, { type: mime });
 };
+
+// window.WAPI.base64ImageToFile = function (b64Data, filename) {
+//     var arr   = b64Data.split(',');
+//     var mime  = arr[0].match(/:(.*?);/)[1];
+//     var bstr  = atob(arr[1]);
+//     var n     = bstr.length;
+//     var u8arr = new Uint8Array(n);
+
+//     while (n--) {
+//         u8arr[n] = bstr.charCodeAt(n);
+//     }
+
+//     return new File([u8arr], filename, {type: mime});
+// };
 
 /**
  * Send contact card to a specific chat using the chat ids
@@ -1296,11 +1446,6 @@ window.WAPI.getNewMessageId = function (chatId) {
     return newMsgId;
 };
 
-/**
- * Create an chat ID based in a cloned one for vCard
- *
- * @param {string} chatId '000000000000@c.us'
- */
 window.WAPI.getNewMessageIdVCard = function (chatId) {
     var newMsgId = new Store.MsgKey(Object.assign({}, Store.Msg.models[0].__x_id))
 
@@ -1313,19 +1458,15 @@ window.WAPI.getNewMessageIdVCard = function (chatId) {
 };
 
 /**
- * Send Customized VCard without the necessity of contact be a Whatsapp Contact
-*
 *chatId = "5519992605703@c.us" //para quem quero enviar 
 *vcard = "BEGIN:VCARD\nVERSION:3.0\nN:;0;;;\nFN:Carlos\nTEL;type=CELL;waid=550000000000:+00 00 0000-0000\nEND:VCARD" //propriedade do Vcard
 *contactName = "5519992605703" //nome do contato que será enviado
-*contactNumber = "5519992605703" //e o numero do contato
+*contactNumber = "5519992605703" //e o numero do bendito
 */
 window.WAPI.sendVCard = async function (chatId, vcard, contactName, contactNumber) {
-    vcard = vcard.replace(/<>/g,'\n');
-    var chat    = Store.Chat.get(chatId);
+    var chat = Store.Chat.get(chatId);
     var tempMsg = Object.create(Store.Msg.models.filter(msg => msg.__x_isSentByMe && !msg.quotedMsg)[0]);
-    var newId   = window.WAPI.getNewMessageIdVCard(chatId);
-
+    var newId = window.WAPI.getNewMessageIdVCard(chatId);
     var extend = {
         ack: 0,
         id: newId,
@@ -1337,10 +1478,10 @@ window.WAPI.sendVCard = async function (chatId, vcard, contactName, contactNumbe
         type: "vcard",
         body:contactNumber?vcard.replace('TEL;TYPE=WORK,VOICE:',`TEL;TYPE=WORK,VOICE;waid=${contactNumber}:`):vcard,
     };
-
     Object.assign(tempMsg, extend);
     return (await Promise.all(Store.addAndSendMsgToChat(chat, tempMsg)))[1]=="success"
 };
+
 /**
  * Block contact
  * @param {string} id '000000000000@c.us'
