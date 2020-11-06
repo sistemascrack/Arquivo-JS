@@ -762,11 +762,12 @@ function getCountContactsAllGroups() {
 function WMBSP_GETPROFILEPICTUREFROMID(id) {
 
 	try {
-		var urlImage = "";
+		var urlImage = [];
 
-		urlImage = document.getElementsByClassName("_2goTk _1Jdop _3Whw5")[0].src;
-
-		return urlImage;
+		urlImage = document.getElementsByClassName("_2goTk _1Jdop _3Whw5")[0].src.split("pp?e=");
+		
+		
+		return urlImage[1];
 	} catch (e) {
 		return "";
 	}
