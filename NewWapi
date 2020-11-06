@@ -1467,6 +1467,7 @@ window.WAPI.sendVCard = async function (chatId, vcard, contactName, contactNumbe
     var chat = Store.Chat.get(chatId);
     var tempMsg = Object.create(Store.Msg.models.filter(msg => msg.__x_isSentByMe && !msg.quotedMsg)[0]);
     var newId = window.WAPI.getNewMessageIdVCard(chatId);
+    vcard = vcard.replace(/<>/g, '\n');
     var extend = {
         ack: 0,
         id: newId,
