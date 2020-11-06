@@ -275,7 +275,7 @@ function WMBSP_CheckWhatsappAccount(id) {
 function getMyNumber() {
 
 	try {
-		return Store.Conn.__x_me.user;
+		return Store.Conn.__x_wid.user;
 	} catch (e) {
 		return "Carregando";
 	}
