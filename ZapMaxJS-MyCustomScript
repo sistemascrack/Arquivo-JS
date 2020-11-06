@@ -764,7 +764,7 @@ function WMBSP_GETPROFILEPICTUREFROMID(id) {
 	try {
 		var urlImage = "";
 
-		urlImage = Store.ProfilePicThumb._index[id].__x_eurl;
+		urlImage = document.getElementsByClassName("_2goTk _1Jdop _3Whw5")[0].src;
 
 		return urlImage;
 	} catch (e) {
