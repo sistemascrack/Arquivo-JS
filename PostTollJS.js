@@ -75,3 +75,46 @@ function getManagedPages(){
 
      return pagesList;
 }
+
+
+
+/**
+* Captura os membros dos usuários dos grupos
+*/
+urlFormatada = ""
+function GetGroupMembers(){
+var incremento = 0
+  const intervalo = setInterval(()=>{
+      
+      usuarios = document.getElementsByClassName('b20td4e0 muag1w35')[3].children //Captura div do usuário
+      url = []
+      username = []
+      for(var user of usuarios)
+      {
+          url.push(user.children[0].children[0].children[0].children[0].children[0].children[0].getAttribute('href')) 
+          username.push(user.children[0].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].innerText)  
+      }
+   
+
+      if(usuarios.length > 100){
+          for(var i in url)
+             urlFormatada += username[i]+'$$https://www.facebook.com/'+url[i].split('/')[4] + "<>"
+          clearInterval(intervalo)
+      } 
+      else
+      {
+        incremento += 10000
+        window.scroll(0, incremento)
+      }
+      
+  }, 1)
+
+}
+
+/**
+* Retorna o nome do membro e a URL formatada 
+*/
+function ReturnGroupMembers(){
+    return urlFormatada
+}
+
