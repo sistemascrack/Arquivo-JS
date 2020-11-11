@@ -82,9 +82,6 @@ function getManagedPages(){
 /**
 * Captura os membros dos usuários dos grupos
 */
-/**
-* Captura os membros dos usuários dos grupos
-*/
 infoMember= ""
 function GetGroupMembers(){
 var incremento = 0
@@ -102,7 +99,7 @@ var incremento = 0
 
       if(usuarios.length > 100){
           for(var i in url)
-             infoMember += username[i]+'$$https://www.facebook.com/'+url[i].split('/')[4] + "<>"
+             infoMember += username[i]+'<!!>https://www.facebook.com/'+url[i].split('/')[4] + "<$$>"
           clearInterval(intervalo)
       } 
       else
