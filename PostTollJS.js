@@ -129,6 +129,18 @@ function getPhotoUrl(){
     else
         return ""
 }
- 
- 
+
+/**
+ * clica no botão para iniciar a publicação
+ */
+function clickOnPublish(){
+    document.getElementsByClassName("_4g34 _195r _5wc_ _55st")[0].click()
+}
+
+/**
+ * foca no text area para escrever o texto da publicação.
+ */
+function focusOnTextArea(){
+    document.getElementsByClassName("_5whq input composerInput")[0].focus()
+}
  
