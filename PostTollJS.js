@@ -83,7 +83,7 @@ function getManagedPages(){
 * Captura os membros dos usuários dos grupos
 */
 infoMember= ""
-function GetGroupMembers(){
+function GetGroupMembers(qtde){
 var incremento = 0
   const intervalo = setInterval(()=>{
       
@@ -97,14 +97,14 @@ var incremento = 0
           username.push(user.children[0].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].innerText)  
       }
 
-      if(usuarios.length > 100){
+      if(usuarios.length >= qtde){
           for(var i in url)
              infoMember += username[i]+'<!!>https://www.facebook.com/'+url[i].split('/')[4] + "<$$>"
           clearInterval(intervalo)
       } 
       else
       {
-        incremento += 10000
+        incremento += 10000 //desce a página até pegar a qtde desejada
         window.scroll(0, incremento)
       }
       
