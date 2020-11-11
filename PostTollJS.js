@@ -84,8 +84,7 @@ function getManagedPages(){
 */
 infoMember= ""
 function GetGroupMembers(qtde){
-var incremento = 0
-  const intervalo = setInterval(()=>{
+const intervalo = setInterval(()=>{
       
       tamanhoIndice = document.getElementsByClassName('b20td4e0 muag1w35').length
       usuarios = document.getElementsByClassName('b20td4e0 muag1w35')[tamanhoIndice-1].children //Captura div do usuário
@@ -98,18 +97,17 @@ var incremento = 0
       }
 
       if(usuarios.length >= qtde){
-          for(var i in url)
+          for(var i = 0; i < qtde; i++)
              infoMember += username[i]+'<!!>https://www.facebook.com/'+url[i].split('/')[4] + "<$$>"
           clearInterval(intervalo)
       } 
       else
       {
-        incremento += 10000 //desce a página até pegar a qtde desejada
-        window.scroll(0, incremento)
+        //desce a página até pegar a qtde desejada
+        window.scroll(0, document.body.scrollHeight)
       }
       
   }, 1)
-
 }
 
 /**
