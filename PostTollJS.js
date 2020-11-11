@@ -143,4 +143,10 @@ function clickOnPublish(){
 function focusOnTextArea(){
     document.getElementsByClassName("_5whq input composerInput")[0].focus()
 }
- 
+
+/**
+ * clica no botão para postar a publicação.
+ */
+function clickOnPost(){
+	document.querySelector("#composer-main-view-id").firstElementChild.firstElementChild.lastElementChild.firstElementChild.firstElementChild.click()	
+}
