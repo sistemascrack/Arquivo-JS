@@ -2,6 +2,21 @@
  * Arquivo que contém as funções js do PostTool a serem realizadas no navegador.
  */
 
+/**
+ * Inseri o username e a senha no campo de login.
+ */
+function insertLogin(username, password){
+	document.querySelectorAll("[name ^= 'email']")[0].value = username;
+	document.querySelectorAll("[name ^= 'pass']")[0].value = password
+}
+
+/**
+ * Clica no botão para realizar o login.
+ */
+function clickOnLogin(){
+	document.getElementById("u_0_b").click()	
+}
+
 var qtdGroupsDivisions; // armazena quantidade de divisões (groups you managed, other ...) de grupos que existem
 var amountGroups; // armazena a quantidade de grupos que o usuário faz parte renderizados na tela
 
