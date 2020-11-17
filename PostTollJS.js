@@ -115,7 +115,7 @@ const intervalo = setInterval(()=>{
             if(url[i].contains("groups"))
                  infoMember += username[i]+'<!!>https://m.facebook.com/'+url[i].split('/')[4] + "<$$>"
             else
-                infoMember += username[i]+'<!!>'+url[i] + "<$$>"
+                infoMember += username[i]+'<!!>'+url[i].replace(/www/g,'m') + "<$$>"
           }
 
           clearInterval(intervalo)
