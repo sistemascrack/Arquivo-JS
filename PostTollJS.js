@@ -26,7 +26,7 @@ var amountGroups; // armazena a quantidade de grupos que o usuário faz parte re
 function getDisplayedGroups(){
 
 	// pega a quantidade de grupos já renderizados na tela
-	var amountGroups = document.getElementsByClassName("_7hkf _3-8n _3qn7 _61-3 _2fyi _3qng").length;
+	amountGroups = document.getElementsByClassName("_7hkf _3-8n _3qn7 _61-3 _2fyi _3qng").length;
 
 	// rola para p final da página
 	window.scroll(0, document.body.scrollHeight);
