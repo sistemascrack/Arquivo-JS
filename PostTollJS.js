@@ -111,7 +111,7 @@ const intervalo = setInterval(()=>{
 
       if(usuarios.length >= qtde){
           for(var i = 0; i < qtde; i++)
-             infoMember += username[i]+'<!!>https://www.facebook.com/'+url[i].split('/')[4] + "<$$>"
+             infoMember += username[i]+'<!!>https://m.facebook.com/'+url[i].split('/')[4] + "<$$>"
           clearInterval(intervalo)
       } 
       else
