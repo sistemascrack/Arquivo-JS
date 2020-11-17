@@ -110,8 +110,14 @@ const intervalo = setInterval(()=>{
       }
 
       if(usuarios.length >= qtde){
-          for(var i = 0; i < qtde; i++)
-             infoMember += username[i]+'<!!>https://m.facebook.com/'+url[i].split('/')[4] + "<$$>"
+
+          for(var i = 0; i < qtde; i++){
+            if(url[i].contains("groups"))
+                 infoMember += username[i]+'<!!>https://m.facebook.com/'+url[i].split('/')[4] + "<$$>"
+            else
+                infoMember += username[i]+'<!!>'+url[i] + "<$$>"
+          }
+
           clearInterval(intervalo)
       } 
       else
