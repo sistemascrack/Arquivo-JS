@@ -24,11 +24,9 @@ var amountGroups; // armazena a quantidade de grupos que o usuário faz parte re
  * Pega a quantidade de grupos que o usuário faz parte renderizados na tela.
  */
 function getDisplayedGroups(){
-	// pega a quantidade de divisões (groups you managed, other ...) de grupos que existem
-	qtdGroupsDivisions = document.getElementsByClassName("_2pip").length;
 
 	// pega a quantidade de grupos já renderizados na tela
-	amountGroups = document.getElementsByClassName("_2pip")[qtdGroupsDivisions - 1].children.length;
+	var amountGroups = document.getElementsByClassName("_7hkf _3-8n _3qn7 _61-3 _2fyi _3qng").length;
 
 	// rola para p final da página
 	window.scroll(0, document.body.scrollHeight);
@@ -48,10 +46,10 @@ function getGroups(){
 	for (var i = 0; i < amountGroups; i++){
 
 		// pega o nome do grupo
-		groupsList += document.getElementsByClassName("_2pip")[qtdGroupsDivisions - 1].children[i].firstElementChild.firstElementChild.firstElementChild.lastElementChild.firstElementChild.innerText + "<!!>";
+		groupsList += document.getElementsByClassName("_7hkf _3-8n _3qn7 _61-3 _2fyi _3qng")[i].firstElementChild.children[1].firstElementChild.textContent + "<!!>";
 
 		// pega o id do grupo
-		groupsList += document.getElementsByClassName("_2pip")[qtdGroupsDivisions - 1].children[i].firstElementChild.href.split('/')[4] + "<$$>";
+		groupsList += document.getElementsByClassName("_7hkf _3-8n _3qn7 _61-3 _2fyi _3qng")[i].parentElement.href.split('/')[4] + "<$$>";
 	}
 
 	return groupsList;
