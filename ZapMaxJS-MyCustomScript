@@ -764,7 +764,7 @@ function WMBSP_GETPROFILEPICTUREFROMID(id) {
 	try {
 		var urlImage = [];
 
-		urlImage = document.getElementsByClassName("_2goTk _1Jdop _3Whw5")[0].src.split("pp?e=");
+		urlImage = document.getElementsByClassName("_3t3gU rlUm6 _1VzZY")[0].src.split("pp?e=");
 		
 		urlImage[1] = urlImage[1].replace(/%3A/g, ":").replace(/%2F/g, "/").replace(/%3F/g, "?").replace(/%3D/g, "=").replace(/%26/g, "&");
 		
