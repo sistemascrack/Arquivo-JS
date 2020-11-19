@@ -766,7 +766,7 @@ function WMBSP_GETPROFILEPICTUREFROMID(id) {
 
 		urlImage = document.getElementsByClassName("_3t3gU rlUm6 _1VzZY")[0].src.split("pp?e=");
 		
-		urlImage[1] = urlImage[1].replace(/%3A/g, ":").replace(/%2F/g, "/").replace(/%3F/g, "?").replace(/%3D/g, "=").replace(/%26/g, "&").replace(/%40/g, "@";
+		urlImage[1] = urlImage[1].replace(/%3A/g, ":").replace(/%2F/g, "/").replace(/%3F/g, "?").replace(/%3D/g, "=").replace(/%26/g, "&").replace(/%40/g, "@");
 		
 		return urlImage[1];
 	} catch (e) {
