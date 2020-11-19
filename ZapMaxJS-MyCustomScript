@@ -151,15 +151,15 @@ function checkWhatsAppConnection() {
 	try {
 
 
-		if (typeof document.getElementsByClassName("J3VFH")[0] !== "undefined") {
-			if (document.getElementsByClassName("J3VFH")[0].outerText === "Search or start new chat") {
+		if (typeof document.getElementsByClassName("_1MBn6")[0] !== "undefined") {
+			if (document.getElementsByClassName("_1MBn6")[0].outerText === "Search or start new chat") {
 				userIsConnected = true;
 			}
 		}
 
 		if (typeof document.getElementsByClassName("landing-landing-title VeVN5")[0] === "undefined") {
 
-			if (typeof document.getElementsByClassName("J3VFH")[0] !== "undefined" || document.getElementsByClassName("_1QMFu")[0] === null) {
+			if (typeof document.getElementsByClassName("_1MBn6")[0] !== "undefined" || document.getElementsByClassName("_1QMFu")[0] === null) {
 				userIsConnected = true;
 			}
 
